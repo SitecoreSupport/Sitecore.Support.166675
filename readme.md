@@ -1,5 +1,5 @@
 # Sitecore.Support.166675
-Implementing custom DI container causes memory leak
+Implementing custom Dependency Injection container causes memory leak
 
 ## License  
 This patch is licensed under the [Sitecore Corporation A/S License for GitHub](https://github.com/sitecoresupport/Sitecore.Support.166675/blob/master/LICENSE).  
