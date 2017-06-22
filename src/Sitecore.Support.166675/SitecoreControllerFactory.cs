@@ -38,7 +38,8 @@ namespace Sitecore.Support.Mvc.Controllers
                 if (factory != null)
                 {
                     //Get controller type
-                    MethodInfo dynMethod = factory.GetType().GetMethod("GetControllerType", BindingFlags.NonPublic | BindingFlags.Instance);
+                    MethodInfo dynMethod = factory.GetType()
+                        .GetMethod("GetControllerType", BindingFlags.NonPublic | BindingFlags.Instance);
 
                     Type serviceType = (Type)dynMethod.Invoke(factory, new object[] { requestContext, controllerName });
 
@@ -46,8 +47,25 @@ namespace Sitecore.Support.Mvc.Controllers
                     {
                         if (scope != null)
                         {
-                            var controller = (scope.ServiceProvider.GetService(serviceType) as IController) ?? TypeHelper.CreateObject<IController>(serviceType, new object[0]);
-                            return (controller ?? this.InnerFactory.CreateController(requestContext, controllerName));
+                            var service = scope.ServiceProvider.GetService(serviceType);
+                            if (service is IController)
+                                return (service as IController);
+
+                            return this.InnerFactory.CreateController(requestContext, controllerName);
+                        }
+                    }
+                    else
+                    {
+                        serviceType = TypeHelper.GetType(controllerName);
+
+                        if (serviceType != null)
+                        {
+                            IController controller = (DependencyResolver.Current.GetService(serviceType) as IController) ??
+                                                     TypeHelper.CreateObject<IController>(serviceType, new object[0]);
+                            if (controller != null)
+                            {
+                                return controller;
+                            }
                         }
                     }
                 }
